@@ -2,6 +2,10 @@
 
 A simple demo showing how to use the [Groq Whisper API](https://console.groq.com/docs/speech-text) for speech-to-text transcription — both as a standalone script and as a small web app.
 
+<center>
+<img src="./images/duck-app.jpg" width=400>
+</center>
+
 ---
 
 ## Project Structure
