@@ -138,9 +138,10 @@ app.post("/tts", async (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-// Catch-all: serve the React app for any non-API route (client-side routing)
+// Catch-all: serve the React app for any non-API route (client-side routing).
+// Express 5 + path-to-regexp v8 requires a named wildcard — bare "*" is invalid.
 // -----------------------------------------------------------------------------
-app.get("*", (req, res) => {
+app.get("/*path", (req, res) => {
   res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
 
