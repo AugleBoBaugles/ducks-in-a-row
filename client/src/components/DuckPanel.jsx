@@ -107,7 +107,7 @@ export default function DuckPanel({ onScheduleUpdate }) {
         aria-label={isRecording ? "Stop recording" : "Speak to the duck"}
         disabled={phase === "processing"}
       >
-        <img src="/duck.svg" alt="rubber duck" />
+        <img src="/duck.png" alt="rubber duck" />
       </button>
 
       <p className={`${styles.status} ${phase === "error" ? styles.error : ""}`}>

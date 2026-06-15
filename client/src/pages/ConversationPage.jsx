@@ -132,7 +132,7 @@ export default function ConversationPage({ onScheduleReady }) {
         aria-label={isRecording ? "Stop recording" : "Start speaking"}
         disabled={phase === "processing"}
       >
-        <img src="/duck.svg" alt="rubber duck" />
+        <img src="/duck.png" alt="rubber duck" />
       </button>
 
       {/* Status line shown during processing / speaking / errors */}
