@@ -1,0 +1,73 @@
+/* ScheduleCalendar.module.css */
+
+.calendar {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Relative container so blocks can be absolutely positioned over the grid */
+.grid {
+  position: relative;
+}
+
+/* One row per hour */
+.hourRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding-top: 4px;
+}
+
+.hourLabel {
+  width: 48px;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: right;
+  padding-top: 2px;
+}
+
+/* Horizontal rule across the hour */
+.hourLine {
+  flex: 1;
+  border-top: 1px solid var(--border);
+  margin-top: 10px;
+}
+
+/* Schedule blocks are absolutely positioned over the grid */
+.block {
+  position: absolute;
+  left: 56px;  /* clear the hour labels */
+  right: 4px;
+  border-radius: 4px;
+  padding: 4px 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.taskBlock {
+  background: rgba(255, 189, 84, 0.18);
+  border-left: 3px solid var(--yellow);
+}
+
+.breakBlock {
+  background: rgba(166, 248, 255, 0.1);
+  border-left: 3px solid var(--blue);
+}
+
+.blockLabel {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.blockTime {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}

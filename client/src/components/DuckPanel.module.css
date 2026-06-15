@@ -1,0 +1,74 @@
+/* DuckPanel.module.css — compact duck interaction for the schedule page */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.duck {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  outline: none;
+}
+
+.duck img {
+  width: 90px;
+  height: 90px;
+  display: block;
+}
+
+.duck.idle:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 14px rgba(255, 189, 84, 0.4));
+}
+
+.duck.recording {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.duck.speaking {
+  animation: bob 0.8s ease-in-out infinite;
+}
+
+.duck:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 189, 84, 0.5)); }
+  50%       { filter: drop-shadow(0 0 20px rgba(255, 189, 84, 0.9)); transform: scale(1.05); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+.status {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.error {
+  color: var(--danger);
+  font-style: normal;
+}
+
+.reply {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.65;
+  border-left: 2px solid var(--yellow);
+  padding-left: 0.85rem;
+  font-style: italic;
+}
