@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "client": "vite --root client",
+    "client": "vite",
     "dev": "concurrently \"npm run start\" \"npm run client\"",
-    "build": "vite build --root client",
+    "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
