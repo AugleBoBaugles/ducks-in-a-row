@@ -1,86 +1,112 @@
 // =============================================================================
 // services/rubberDucky.js
 // =============================================================================
-// Responsible for one thing: taking a piece of text the user spoke and getting
-// a helpful "rubber ducky" response from Groq's LLM.
+// Sends the user's transcribed speech to Groq's LLM and gets back a response
+// from the rubber duck scheduling assistant.
 //
-// "Rubber duck debugging" is a real technique where programmers explain their
-// problem out loud to a rubber duck — the act of articulating it often reveals
-// the solution. This service plays the role of a duck that actually talks back.
+// The duck persona: deeply wise, unhurried, slightly intimidating — but
+// genuinely invested in your wellbeing. Think Morgan Freeman energy.
+//
+// The duck's job is to ask focused questions across 3–5 turns to understand
+// what the user needs to get done today, then emit a structured JSON schedule.
+//
+// Exports:
+//   askRubberDucky(transcribedText, history) → { reply, schedule }
+//     - reply:    the duck's text response (JSON block stripped out)
+//     - schedule: parsed schedule object, or null if not yet ready
 // =============================================================================
 
 import Groq from "groq-sdk";
 
-const groq = new Groq(); // auto-reads GROQ_API_KEY from process.env
+const groq = new Groq(); // reads GROQ_API_KEY from process.env automatically
 
 
 // -----------------------------------------------------------------------------
 // SYSTEM PROMPT
-// The system prompt is a set of instructions sent to the LLM before the
-// user's message. It defines the AI's persona, rules, and context.
-// Keeping it as a constant up here makes it easy to find and tweak.
+// Defines the duck's persona and rules for the entire conversation.
+// Injected as the first "system" message in every request.
 // -----------------------------------------------------------------------------
-const SYSTEM_PROMPT = `You are a friendly and helpful rubber duck assistant.
+const SYSTEM_PROMPT = `You are a rubber duck — but not an ordinary one. You have witnessed every deadline, every anxious morning, every task that was underestimated and stretched into the night. You speak rarely, but when you do, people listen.
 
-The user has spoken a sentence or question out loud to their computer.
-Your job is to listen carefully and respond like a thoughtful rubber duck
-debugging partner — supportive, constructive, and concise.
+Your purpose: help the person build an honest, realistic plan for their day.
 
-A few guidelines:
-- If they seem to be describing a problem or bug, ask a gentle clarifying
-  question or point out something they might have overlooked.
-- If they're just thinking out loud, reflect their idea back and affirm
-  or gently challenge it.
-- Keep your response short (2–4 sentences). You're a duck, not a textbook.
-- Be warm and encouraging. Quack sparingly.`;
+HOW YOU WORK:
+- Ask focused questions, one or two at a time, across 3 to 5 conversation turns.
+- Gather: what they need to accomplish, how much time they have, their energy level, and which tasks feel uncertain or difficult.
+- Once you have enough to build a real plan, produce the schedule.
+
+WHEN YOU ARE READY TO SCHEDULE:
+End your response with a JSON block in exactly this format — nothing before or after the block except your brief closing words:
+
+\`\`\`json
+{
+  "tasks": [
+    { "id": 1, "name": "Task name", "duration": 90, "priority": "high", "completed": false }
+  ],
+  "schedule": [
+    { "startTime": "09:00", "endTime": "10:30", "label": "Task name", "type": "task" },
+    { "startTime": "10:30", "endTime": "10:45", "label": "Break", "type": "break" }
+  ]
+}
+\`\`\`
+
+SCHEDULE RULES:
+- Times in 24-hour HH:MM format
+- Include a 10–15 minute break after every 60–90 minutes of work
+- Priority: "high", "medium", or "low"
+- Do not produce a schedule until you have enough information to make it honest
+
+TONE:
+- Measured. Unhurried. You have seen everything and judge nothing — but you miss nothing either.
+- Warm, but not effusive. Caring, but not coddling.
+- Brief responses. You do not need many words.
+- No exclamation marks. No hollow encouragement.`;
 
 
 // -----------------------------------------------------------------------------
-// askRubberDucky()
-//
-// Sends the transcribed text to Groq's LLM chat API and returns the response.
+// SCHEDULE JSON PATTERN
+// Matches a ```json ... ``` block anywhere in the LLM's response.
+// -----------------------------------------------------------------------------
+const SCHEDULE_PATTERN = /```json\n([\s\S]*?)\n```/;
+
+
+// -----------------------------------------------------------------------------
+// askRubberDucky(transcribedText, history)
 //
 // Parameters:
-//   transcribedText  {string}  — what the user said (from the Whisper service)
+//   transcribedText {string}   — what the user just said (from Whisper)
+//   history         {Array}    — prior conversation turns in OpenAI message format:
+//                                [{ role: 'user'|'assistant', content: string }, ...]
 //
 // Returns:
-//   {Promise<string>}          — the rubber ducky's response
+//   {Promise<{ reply: string, schedule: object|null }>}
+//     reply    — the duck's response text (JSON block removed)
+//     schedule — parsed schedule object if the duck emitted one, otherwise null
 // -----------------------------------------------------------------------------
-export async function askRubberDucky(transcribedText) {
+export async function askRubberDucky(transcribedText, history = []) {
 
-  // groq.chat.completions.create() calls the LLM API.
-  // It follows the same "messages array" format as the OpenAI API, which Groq
-  // is compatible with. Each message has a "role" and "content":
-  //   "system"    → background instructions the model follows (the user never sees this)
-  //   "user"      → what the user said
-  //   "assistant" → what the model previously replied (used to build multi-turn chats)
+  // Build the full message array: system prompt → conversation history → new user turn
+  const messages = [
+    { role: "system", content: SYSTEM_PROMPT },
+    ...history,
+    { role: "user", content: transcribedText },
+  ];
+
   const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile", // a capable, fast open-source LLM hosted on Groq
-
-    messages: [
-      {
-        role: "system",
-        content: SYSTEM_PROMPT,
-      },
-      {
-        role: "user",
-        // Give the model context that this text was spoken, not typed.
-        // This shapes how it interprets casual phrasing or incomplete sentences.
-        content: `The user spoke this to their computer: "${transcribedText}"`,
-      },
-    ],
-
-    // temperature controls how creative/random the response is.
-    // 0.0 = deterministic, 1.0 = very creative. 0.7 is a good balance for conversation.
-    temperature: 0.7,
-
-    // max_tokens caps the response length. 1 token ≈ ¾ of a word.
-    // 300 tokens is roughly 3–5 sentences — plenty for a rubber ducky.
-    max_tokens: 300,
+    model: "llama-3.3-70b-versatile",
+    messages,
+    temperature: 0.7,   // balanced creativity for natural conversation
+    max_tokens: 500,    // enough for a response + a full schedule JSON block
   });
 
-  // The LLM response is nested inside an array of "choices" (you can request
-  // multiple response variations at once; we're just using the first).
-  // .message.content is the actual text string we want.
-  return completion.choices[0].message.content;
+  const rawReply = completion.choices[0].message.content;
+
+  // Check whether the duck included a schedule JSON block in this response
+  const jsonMatch = rawReply.match(SCHEDULE_PATTERN);
+  const schedule = jsonMatch ? JSON.parse(jsonMatch[1]) : null;
+
+  // Strip the JSON block from the text so the UI only shows the spoken reply
+  const reply = rawReply.replace(SCHEDULE_PATTERN, "").trim();
+
+  return { reply, schedule };
 }
