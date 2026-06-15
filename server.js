@@ -89,6 +89,17 @@ app.post("/transcribe", upload.single("audio"), async (req, res) => {
     );
     console.log(`[${sessionId.slice(0, 8)}] User said: "${text}"`);
 
+    // If Whisper got silence or noise it returns an empty string.
+    // Skip the LLM and send a canned response so the duck doesn't hallucinate.
+    if (!text || text.trim().length < 3) {
+      return res.json({
+        text: "",
+        ducky: "I didn't catch that. Try again?",
+        schedule: null,
+        sessionId,
+      });
+    }
+
     // Step 2: Text + history → Duck response + optional schedule
     console.log(`[${sessionId.slice(0, 8)}] Consulting the duck...`);
     const { reply, schedule } = await askRubberDucky(text, history);
