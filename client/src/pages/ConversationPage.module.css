@@ -1,0 +1,95 @@
+/* ConversationPage.module.css
+   CSS Modules — class names are scoped to this component automatically,
+   so `.page` here won't conflict with a `.page` in another file. */
+
+/* Full-screen dark abyss */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--bg);
+}
+
+.intro {
+  color: var(--text-muted);
+  font-style: italic;
+  letter-spacing: 0.05em;
+  font-size: 0.95rem;
+}
+
+/* The duck button — large, centered, no default button styling */
+.duck {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 50%;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  outline: none;
+}
+
+.duck img {
+  width: 160px;
+  height: 160px;
+  display: block;
+}
+
+/* Idle: subtle glow on hover */
+.duck.idle:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 20px rgba(255, 189, 84, 0.4));
+}
+
+/* Recording: pulsing yellow glow */
+.duck.recording {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* Speaking: gentle bob */
+.duck.speaking {
+  animation: bob 0.8s ease-in-out infinite;
+}
+
+/* Disabled state while processing */
+.duck:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 189, 84, 0.5)); }
+  50%       { filter: drop-shadow(0 0 28px rgba(255, 189, 84, 0.9)); transform: scale(1.04); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* Status text below the duck */
+.status {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.status.error {
+  color: var(--danger);
+  font-style: normal;
+}
+
+/* The duck's reply — styled like a wise quote */
+.reply {
+  max-width: 540px;
+  text-align: center;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  border-left: 3px solid var(--yellow);
+  padding-left: 1.25rem;
+  font-style: italic;
+}
