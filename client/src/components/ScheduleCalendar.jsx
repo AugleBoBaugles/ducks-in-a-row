@@ -26,8 +26,9 @@ function formatHour(h) {
 }
 
 export default function ScheduleCalendar({ blocks = [] }) {
-  // Total timeline height in pixels (each hour = 60px)
-  const HOUR_HEIGHT = 60;
+  // Pixels per hour — bigger values give short blocks (10–15 min breaks) enough
+  // visible height without needing a min-height clamp that causes overlap.
+  const HOUR_HEIGHT = 80;
   const totalHeight = HOURS.length * HOUR_HEIGHT;
 
   return (
@@ -49,7 +50,7 @@ export default function ScheduleCalendar({ blocks = [] }) {
         {blocks.map((block, i) => {
           const topOffset  = timeToOffset(block.startTime) * HOUR_HEIGHT;
           const endOffset  = timeToOffset(block.endTime)   * HOUR_HEIGHT;
-          const blockHeight = Math.max(endOffset - topOffset, 20); // min 20px
+          const blockHeight = endOffset - topOffset;
 
           return (
             <div

@@ -57,6 +57,7 @@ End your response with a JSON block in exactly this format — nothing before or
 
 SCHEDULE RULES:
 - Times in 24-hour HH:MM format
+- Blocks must never overlap — each block's startTime must equal the previous block's endTime
 - Include a 10–15 minute break after every 60–90 minutes of work
 - Priority: "high", "medium", or "low"
 - Do not produce a schedule until you have enough information to make it honest
@@ -90,9 +91,21 @@ const SCHEDULE_PATTERN = /```json\n([\s\S]*?)\n```/;
 // -----------------------------------------------------------------------------
 export async function askRubberDucky(transcribedText, history = []) {
 
-  // Build the full message array: system prompt → conversation history → new user turn
+  // Inject the current time so the duck never schedules tasks in the past.
+  // Formatted as a readable string ("Monday, 2:34 PM") so the LLM understands it naturally.
+  const now = new Date();
+  const timeContext = now.toLocaleString("en-US", {
+    weekday: "long",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
   const messages = [
     { role: "system", content: SYSTEM_PROMPT },
+    // A second system message with the live timestamp — placed before history
+    // so the model always knows what "now" is without repeating it in every turn.
+    { role: "system", content: `The current time is ${timeContext}. Do not schedule anything before this time.` },
     ...history,
     { role: "user", content: transcribedText },
   ];
