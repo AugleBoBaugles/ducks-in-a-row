@@ -44,7 +44,14 @@ export function useAudioPlayback() {
         setIsPlaying(false);
         resolve(); // don't crash the app on audio errors
       };
-      audio.play();
+      // play() returns a Promise that rejects in headless browsers (no audio
+      // output device) or when autoplay is blocked. Catch it here so the
+      // outer Promise still resolves and the app doesn't get stuck.
+      audio.play().catch(() => {
+        URL.revokeObjectURL(url);
+        setIsPlaying(false);
+        resolve();
+      });
     });
   }
 
