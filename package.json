@@ -11,7 +11,8 @@
     "build": "vite build",
     "test": "vitest run --config vitest.config.js",
     "test:watch": "vitest --config vitest.config.js",
-    "test:coverage": "vitest run --config vitest.config.js --coverage"
+    "test:coverage": "vitest run --config vitest.config.js --coverage",
+    "test:e2e": "playwright test"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.0",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.9",
     "concurrently": "^10.0.3",
