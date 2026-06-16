@@ -15,27 +15,33 @@ export default function App() {
   const [page, setPage] = useState("conversation");
   const [schedule, setSchedule] = useState(null);
 
-  // Called by ConversationPage when the duck returns a schedule.
-  // Saves the schedule and switches to the plan view.
   function onScheduleReady(newSchedule) {
     setSchedule(newSchedule);
     setPage("schedule");
   }
 
-  // Called by SchedulePage when the duck updates the plan mid-conversation.
   function onScheduleUpdated(newSchedule) {
     setSchedule(newSchedule);
+  }
+
+  // Clears the duck's memory by dropping the session ID — the next request
+  // will generate a fresh one, starting a new conversation server-side.
+  function handleReset() {
+    sessionStorage.removeItem("ducks-session-id");
+    setSchedule(null);
+    setPage("conversation");
   }
 
   return (
     <>
       {page === "conversation" && (
-        <ConversationPage onScheduleReady={onScheduleReady} />
+        <ConversationPage onScheduleReady={onScheduleReady} onReset={handleReset} />
       )}
       {page === "schedule" && (
         <SchedulePage
           schedule={schedule}
           onScheduleUpdated={onScheduleUpdated}
+          onReset={handleReset}
         />
       )}
     </>

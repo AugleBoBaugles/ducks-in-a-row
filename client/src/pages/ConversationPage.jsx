@@ -10,6 +10,7 @@
 //
 // Props:
 //   onScheduleReady(schedule) — called when the LLM returns a finished schedule
+//   onReset()                 — clears session and resets the conversation
 
 import { useState } from "react";
 import { useSession } from "../hooks/useSession.js";
@@ -17,7 +18,7 @@ import { useRecorder } from "../hooks/useRecorder.js";
 import { useAudioPlayback } from "../hooks/useAudioPlayback.js";
 import styles from "./ConversationPage.module.css";
 
-export default function ConversationPage({ onScheduleReady }) {
+export default function ConversationPage({ onScheduleReady, onReset }) {
   const sessionId = useSession();
   const { isRecording, start, stop } = useRecorder({ maxSeconds: 60 });
   const { isPlaying, play } = useAudioPlayback();
@@ -147,6 +148,12 @@ export default function ConversationPage({ onScheduleReady }) {
         <blockquote className={styles.reply}>
           {duckyReply}
         </blockquote>
+      )}
+
+      {hasStarted && (
+        <button className={styles.resetBtn} onClick={onReset}>
+          start over
+        </button>
       )}
     </div>
   );

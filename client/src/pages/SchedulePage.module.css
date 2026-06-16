@@ -22,6 +22,25 @@
   border-right: none;
 }
 
+.resetBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  margin-top: auto;
+  text-decoration: underline;
+  opacity: 0.5;
+  text-align: center;
+}
+
+.resetBtn:hover {
+  opacity: 1;
+  color: var(--text);
+}
+
 .columnTitle {
   color: var(--yellow);
   font-size: 0.8rem;

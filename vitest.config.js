@@ -8,6 +8,7 @@ export default defineConfig({
   test: {
     root: ".",
     include: ["tests/**/*.test.js"],
+    exclude: ["tests/e2e/**"],
     environment: "node",
   },
 });

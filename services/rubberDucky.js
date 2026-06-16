@@ -40,11 +40,15 @@ IF YOU DID NOT UNDERSTAND:
 - Example: "I didn't catch that. Could you try again?"
 - Never fabricate what the person might have meant.
 
-WHEN YOU ARE READY TO SCHEDULE:
-End your response with a JSON block in exactly this format — nothing before or after the block except your brief closing words:
+RESPONSE FORMAT:
+You must ALWAYS respond with a valid JSON object and nothing else — no markdown, no code fences, no prose outside the JSON.
 
-\`\`\`json
+While still gathering information (no schedule yet):
+{ "reply": "Your words here.", "tasks": null, "schedule": null }
+
+When you are ready to produce the schedule, populate tasks and schedule:
 {
+  "reply": "Your brief closing words.",
   "tasks": [
     { "id": 1, "name": "Task name", "duration": 90, "priority": "high", "completed": false }
   ],
@@ -53,7 +57,6 @@ End your response with a JSON block in exactly this format — nothing before or
     { "startTime": "10:30", "endTime": "10:45", "label": "Break", "type": "break" }
   ]
 }
-\`\`\`
 
 SCHEDULE RULES:
 - Times in 24-hour HH:MM format
@@ -69,11 +72,6 @@ TONE:
 - No exclamation marks. No hollow encouragement.`;
 
 
-// -----------------------------------------------------------------------------
-// SCHEDULE JSON PATTERN
-// Matches a ```json ... ``` block anywhere in the LLM's response.
-// -----------------------------------------------------------------------------
-const SCHEDULE_PATTERN = /```json\n([\s\S]*?)\n```/;
 
 
 // -----------------------------------------------------------------------------
@@ -113,18 +111,27 @@ export async function askRubberDucky(transcribedText, history = []) {
   const completion = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages,
-    temperature: 0.7,   // balanced creativity for natural conversation
-    max_tokens: 500,    // enough for a response + a full schedule JSON block
+    temperature: 0.7,
+    max_tokens: 1000,
+    response_format: { type: "json_object" },
   });
 
   const rawReply = completion.choices[0].message.content;
 
-  // Check whether the duck included a schedule JSON block in this response
-  const jsonMatch = rawReply.match(SCHEDULE_PATTERN);
-  const schedule = jsonMatch ? JSON.parse(jsonMatch[1]) : null;
+  // The model is forced into JSON mode, so rawReply is always a JSON object.
+  // Parse it and pull out the three fields we care about.
+  let parsed;
+  try {
+    parsed = JSON.parse(rawReply);
+  } catch {
+    // If the model somehow returns non-JSON, surface the raw text and no schedule.
+    return { reply: rawReply.trim(), schedule: null };
+  }
 
-  // Strip the JSON block from the text so the UI only shows the spoken reply
-  const reply = rawReply.replace(SCHEDULE_PATTERN, "").trim();
+  const reply = parsed.reply?.trim() || "Your plan is ready.";
+  const schedule = parsed.tasks && parsed.schedule
+    ? { tasks: parsed.tasks, schedule: parsed.schedule }
+    : null;
 
   return { reply, schedule };
 }

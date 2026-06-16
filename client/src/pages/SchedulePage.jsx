@@ -8,6 +8,7 @@
 // Props:
 //   schedule          — { tasks: [], schedule: [] } from the LLM
 //   onScheduleUpdated — called when the duck refines the plan mid-conversation
+//   onReset()         — clears session and returns to the conversation page
 
 import { useState } from "react";
 import ScheduleCalendar from "../components/ScheduleCalendar.jsx";
@@ -15,7 +16,7 @@ import TodoList from "../components/TodoList.jsx";
 import DuckPanel from "../components/DuckPanel.jsx";
 import styles from "./SchedulePage.module.css";
 
-export default function SchedulePage({ schedule, onScheduleUpdated }) {
+export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
   // tasks is a local copy so the user can toggle checkboxes without re-fetching
   const [tasks, setTasks] = useState(schedule.tasks);
 
@@ -50,6 +51,9 @@ export default function SchedulePage({ schedule, onScheduleUpdated }) {
       <section className={styles.column}>
         <h2 className={styles.columnTitle}>The Duck</h2>
         <DuckPanel onScheduleUpdate={handleScheduleUpdate} />
+        <button className={styles.resetBtn} onClick={onReset}>
+          start over
+        </button>
       </section>
     </div>
   );
