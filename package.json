@@ -9,9 +9,9 @@
     "client": "vite",
     "dev": "concurrently \"npm run start\" \"npm run client\"",
     "build": "vite build",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test": "vitest run --config vitest.config.js",
+    "test:watch": "vitest --config vitest.config.js",
+    "test:coverage": "vitest run --config vitest.config.js --coverage"
   },
   "keywords": [],
   "author": "",

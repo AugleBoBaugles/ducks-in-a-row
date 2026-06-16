@@ -159,8 +159,14 @@ app.get("/*path", (req, res) => {
 
 // -----------------------------------------------------------------------------
 // START
+// Export the app so integration tests can import it without starting a server.
+// When this file is run directly (not imported by tests), start listening.
 // -----------------------------------------------------------------------------
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log("Press Ctrl+C to stop.");
-});
+export default app;
+
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+    console.log("Press Ctrl+C to stop.");
+  });
+}

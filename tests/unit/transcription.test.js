@@ -4,22 +4,23 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// --- Mock the groq-sdk before importing the service ---
-// vi.mock replaces the entire module with our fake version.
-// The factory function returns a mock Groq class whose
-// audio.transcriptions.create() method we can control per test.
 const mockCreate = vi.fn();
-vi.mock("groq-sdk", () => ({
-  default: vi.fn().mockImplementation(() => ({
-    audio: {
-      transcriptions: {
-        create: mockCreate,
-      },
-    },
-  })),
-}));
 
-// Import after mocking so the service picks up the fake SDK
+// The service imports both the Groq class and a `toFile` helper from groq-sdk.
+// We use importOriginal to keep the real toFile (it just wraps a buffer, no API call)
+// and only replace the Groq constructor to intercept API calls.
+vi.mock("groq-sdk", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    default: vi.fn(function () {
+      this.audio = {
+        transcriptions: { create: mockCreate },
+      };
+    }),
+  };
+});
+
 const { transcribeAudio } = await import("../../services/transcription.js");
 
 describe("transcribeAudio", () => {
