@@ -1,144 +1,100 @@
-# Groq Whisper Transcription Demo
+# Ducks in a Row
 
-A simple demo showing how to use the [Groq Whisper API](https://console.groq.com/docs/speech-text) for speech-to-text transcription — both as a standalone script and as a small web app.
+An AI scheduling assistant powered by a wise, slightly intimidating rubber duck. Speak to the duck about your day — it asks focused questions about your tasks, energy level, and time available, then builds you a realistic schedule with breaks built in.
 
 <center>
-<img src="./images/duck-app.jpg" width=400>
+<img src="./images/duck-app.png" width=400>
 </center>
 
 ---
 
-## Project Structure
+## AI Components
 
-```
-groq-whisper-tts-demo/
-│
-├── .env                        # Your secret API key (never commit this!)
-│
-├── main.js                     # Standalone script — transcribes a fixed file and
-│                               # prints the result to the console. Good reference
-│                               # for understanding the core Groq API call.
-│
-├── server.js                   # Express web server — serves the frontend and
-│                               # coordinates the two backend services.
-│
-├── services/                   # Backend services (Node.js, run on the server)
-│   ├── transcription.js        # Groq Whisper logic (audio → text)
-│   └── rubberDucky.js          # Groq LLM logic (text → rubber ducky response)
-│
-├── public/                     # Frontend files (run in the browser)
-│   ├── index.html              # HTML structure
-│   ├── styles.css              # All CSS styling
-│   ├── app.js                  # Main UI logic — handles button, fetch, results
-│   ├── recorder.js             # AudioRecorder class — wraps MediaRecorder API
-│   └── duck.svg                # Rubber duck image (the record/stop button)
-│
-├── data/
-│   └── Test-Recording.m4a      # Sample audio file used by main.js
-│
-├── package.json                # Project metadata and npm scripts
-└── README.md                   # This file
-```
+| # | Component | What it does |
+|---|-----------|-------------|
+| 1 | **Groq Whisper** (speech-to-text) | Transcribes the user's spoken audio to text |
+| 2 | **Groq Llama 3.3-70B** (LLM) | Plays the duck persona, gathers scheduling info, emits a structured JSON schedule |
+| 3 | **Google Cloud TTS** (text-to-speech) | Speaks the duck's reply back to the user in a deep, calm voice |
 
 ---
 
 ## How It Works
 
-### Standalone script (`main.js`)
-
 ```
-.env (API key)
-     ↓
-main.js → reads data/Test-Recording.m4a
-        → sends to Groq Whisper API
-        → prints transcription text to console
-```
-
-### Web app (full flow)
-
-```
-Browser                         server.js        services/            Groq API
-─────────────────────────────   ──────────────   ──────────────────   ────────
-app.js + recorder.js
-  │
-  │  User clicks duck button
-  │
-  ├─ recorder.js: getUserMedia() → mic permission popup
-  │
-  ├─ MediaRecorder captures audio chunks
-  │
-  │  User clicks again (or 60s limit hit)
-  │
-  ├─ recorder.js: assembles chunks → audio Blob
-  │
-  POST /transcribe ──────────────>│
-  (multipart/form-data)           │
-                                  ├─ transcription.js ──────────────> Whisper API
-                                  │<── text ───────────────────────────────────│
-                                  │
-                                  ├─ rubberDucky.js ────────────────> LLM API
-                                  │<── ducky ──────────────────────────────────│
-                                  │
-  <── { text, ducky } ────────────│
-  │
-  Display transcription + ducky response
+User clicks duck → mic records → POST /transcribe
+                                        │
+                              Groq Whisper → text
+                                        │
+                              Groq Llama → duck reply + optional schedule JSON
+                                        │
+                              POST /tts → Google TTS → base64 MP3
+                                        │
+                              Duck speaks reply aloud
+                                        │
+                    (repeat until duck has enough info)
+                                        │
+                              Schedule JSON detected
+                                        │
+                              Schedule page renders:
+                                 [Calendar] [Tasks] [Duck]
 ```
 
 ---
 
 ## Setup
 
-### 1. Install dependencies
+See [DEVELOPER.md](DEVELOPER.md) for full instructions from clone to running demo.
+
+Quick version:
 
 ```bash
 npm install
+# create .env with GROQ_API_KEY and GOOGLE_TTS_KEY
+npm run dev        # open http://localhost:5173
 ```
-
-### 2. Add your API key
-
-Create a `.env` file in the project root (or edit the existing one):
-
-```
-GROQ_API_KEY=your_api_key_here
-```
-
-Get a free key at [console.groq.com](https://console.groq.com).
 
 ---
 
-## Running
+## Project Structure
 
-### Web app (recommended)
-
-```bash
-npm start
 ```
-
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Standalone script
-
-```bash
-npm run dev
+ducks-in-a-row/
+├── server.js               Express API server (port 3000)
+├── vite.config.js          Vite build config (React frontend)
+├── services/
+│   ├── transcription.js    Groq Whisper — audio → text
+│   ├── rubberDucky.js      Groq Llama — conversation + schedule JSON
+│   └── tts.js              Google Cloud TTS — text → MP3 audio
+├── client/
+│   ├── index.html
+│   ├── public/duck.png     Duck illustration
+│   └── src/
+│       ├── App.jsx                      Page router
+│       ├── pages/
+│       │   ├── ConversationPage.jsx     Opening screen
+│       │   └── SchedulePage.jsx         3-column plan view
+│       ├── components/
+│       │   ├── ScheduleCalendar.jsx     Hourly timeline
+│       │   ├── TodoList.jsx             Interactive checklist
+│       │   └── DuckPanel.jsx            Duck on the schedule page
+│       └── hooks/
+│           ├── useRecorder.js           MediaRecorder wrapper
+│           ├── useSession.js            Session ID persistence
+│           └── useAudioPlayback.js      Base64 MP3 playback
+└── tests/
+    ├── unit/               Vitest — services tested in isolation
+    ├── integration/        Vitest + Supertest — Express routes
+    └── e2e/                Playwright — full browser tests
 ```
-
-Transcribes `data/Test-Recording.m4a` and prints the text to the console.
 
 ---
 
-## Supported Audio Formats
+## Scripts
 
-`mp3`, `mp4`, `mpeg`, `mpga`, `m4a`, `wav`, `webm`, `ogg`, `flac`
-
-Maximum file size: **25 MB** (Groq API limit).
-
----
-
-## Key Dependencies
-
-| Package | Purpose |
-|---|---|
-| `groq-sdk` | Official Groq client — wraps the API so you don't write raw HTTP requests |
-| `dotenv` | Loads `.env` file into `process.env` |
-| `express` | Web server framework |
-| `multer` | Handles file uploads (multipart/form-data) |
+| Command | What it does |
+|---------|-------------|
+| `npm run dev` | Start Express + Vite together (development) |
+| `npm test` | Run unit and integration tests |
+| `npm run test:e2e` | Run Playwright browser tests |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run build` | Build React app to `client/dist/` |
