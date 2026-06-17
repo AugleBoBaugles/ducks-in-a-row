@@ -30,6 +30,17 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
   const [duckyReply, setDuckyReply] = useState("");
   const [hasStarted, setHasStarted] = useState(false); // hide intro text after first click
 
+  const MORTIMER_INTRO = "My name is Mortimer. I'm here to help you plan your day — tell me what you need to get done, and we'll figure out when to do it. Click the duck when you're ready.";
+
+  async function handleHelp() {
+    if (phase === "processing" || phase === "speaking") return;
+    setHasStarted(true);
+    setDuckyReply(MORTIMER_INTRO);
+    await playReply(MORTIMER_INTRO);
+    setPhase("idle");
+    setStatusText("");
+  }
+
   async function handleDuckClick() {
     // Don't allow clicking while the server is working or audio is playing
     if (phase === "processing" || phase === "speaking") return;
@@ -121,9 +132,14 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
 
   return (
     <div className={styles.page}>
-      {/* Intro prompt — fades out after first click */}
+      {/* Intro prompt — fades out after first interaction */}
       {!hasStarted && (
-        <p className={styles.intro}>click the duck to begin</p>
+        <>
+          <p className={styles.intro}>click the duck to begin</p>
+          <button className={styles.helpBtn} onClick={handleHelp}>
+            who are you?
+          </button>
+        </>
       )}
 
       {/* The duck — click to start/stop recording */}
