@@ -71,7 +71,7 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
         // start() awaits mic permission, then recording begins
         await start();
         setPhase("recording");
-        setStatusText("Listening...");
+        setStatusText("Listening... click the duck to stop.");
       } catch {
         setPhase("error");
         setStatusText("Microphone access denied. Please allow mic access and try again.");
@@ -151,7 +151,7 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
     <div className={styles.page}>
       {/* Intro prompt — fades out after first interaction */}
       {!hasStarted && (
-        <p className={styles.intro}>click the duck to begin</p>
+        <p className={styles.intro}>click to speak — click again to stop</p>
       )}
 
       {/* The duck — click to start/stop recording */}
