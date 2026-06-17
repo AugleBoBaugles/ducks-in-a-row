@@ -30,6 +30,23 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
   const [duckyReply, setDuckyReply] = useState("");
   const [hasStarted, setHasStarted] = useState(false); // hide intro text after first click
 
+  const MOCK_SCHEDULE = {
+    tasks: [
+      { id: 1, name: "Deep work block",     duration: 90, priority: "high",   completed: false },
+      { id: 2, name: "Answer emails",        duration: 30, priority: "medium", completed: false },
+      { id: 3, name: "Review pull requests", duration: 45, priority: "high",   completed: false },
+      { id: 4, name: "Plan tomorrow",        duration: 20, priority: "low",    completed: false },
+    ],
+    schedule: [
+      { startTime: "09:00", endTime: "10:30", label: "Deep work block",     type: "task"  },
+      { startTime: "10:30", endTime: "10:45", label: "Break",               type: "break" },
+      { startTime: "10:45", endTime: "11:15", label: "Answer emails",       type: "task"  },
+      { startTime: "11:15", endTime: "12:00", label: "Review pull requests",type: "task"  },
+      { startTime: "12:00", endTime: "13:00", label: "Lunch",               type: "break" },
+      { startTime: "13:00", endTime: "13:20", label: "Plan tomorrow",       type: "task"  },
+    ],
+  };
+
   const MORTIMER_INTRO = "My name is Mortimer. I'm here to help you plan your day — tell me what you need to get done, and we'll figure out when to do it. Click the duck when you're ready.";
 
   async function handleHelp() {
@@ -134,12 +151,7 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
     <div className={styles.page}>
       {/* Intro prompt — fades out after first interaction */}
       {!hasStarted && (
-        <>
-          <p className={styles.intro}>click the duck to begin</p>
-          <button className={styles.helpBtn} onClick={handleHelp}>
-            who are you?
-          </button>
-        </>
+        <p className={styles.intro}>click the duck to begin</p>
       )}
 
       {/* The duck — click to start/stop recording */}
@@ -151,6 +163,17 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
       >
         <img src="/duck.png" alt="rubber duck" />
       </button>
+
+      {!hasStarted && (
+        <div className={styles.introActions}>
+          <button className={styles.helpBtn} onClick={handleHelp}>
+            who are you?
+          </button>
+          <button className={styles.skipBtn} onClick={() => onScheduleReady(MOCK_SCHEDULE)}>
+            skip to schedule →
+          </button>
+        </div>
+      )}
 
       {/* Status line shown during processing / speaking / errors */}
       {statusText && (

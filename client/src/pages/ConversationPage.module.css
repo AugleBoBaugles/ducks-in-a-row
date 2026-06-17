@@ -82,6 +82,12 @@
   font-style: normal;
 }
 
+.introActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
 .helpBtn {
   background: none;
   border: 1px solid var(--border);
@@ -100,6 +106,23 @@
   opacity: 1;
   border-color: var(--yellow);
   color: var(--text);
+}
+
+.skipBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+
+.skipBtn:hover {
+  opacity: 0.8;
 }
 
 .resetBtn {
