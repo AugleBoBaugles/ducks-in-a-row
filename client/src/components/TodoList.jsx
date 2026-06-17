@@ -3,8 +3,9 @@
 // Striking through completed tasks gives the user a satisfying sense of progress.
 //
 // Props:
-//   tasks    — array of task objects: [{ id, name, priority, completed }]
-//   onToggle — called with the task id when a checkbox is clicked
+//   tasks        — [{ id, name, priority, completed }]
+//   onToggle     — called with task id when checkbox is clicked
+//   hoveredLabel — task name currently highlighted (from SchedulePage hover interaction)
 
 import styles from "./TodoList.module.css";
 
@@ -15,7 +16,7 @@ const PRIORITY_COLORS = {
   low:    "var(--text-muted)",
 };
 
-export default function TodoList({ tasks = [], onToggle }) {
+export default function TodoList({ tasks = [], onToggle, hoveredLabel }) {
   if (tasks.length === 0) {
     return <p className={styles.empty}>No tasks yet.</p>;
   }
@@ -23,7 +24,11 @@ export default function TodoList({ tasks = [], onToggle }) {
   return (
     <ul className={styles.list}>
       {tasks.map((task) => (
-        <li key={task.id} className={styles.item}>
+        <li
+            key={task.id}
+            data-task-item={task.name}
+            className={`${styles.item} ${hoveredLabel === task.name ? styles.itemHighlighted : ""}`}
+          >
           <label className={styles.label}>
             <input
               type="checkbox"

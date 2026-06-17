@@ -15,6 +15,12 @@
   background: var(--surface);
   border-radius: 6px;
   border: 1px solid var(--border);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.itemHighlighted {
+  border-color: var(--yellow);
+  background: rgba(255, 189, 84, 0.08);
 }
 
 .label {

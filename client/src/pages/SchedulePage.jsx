@@ -10,15 +10,37 @@
 //   onScheduleUpdated — called when the duck refines the plan mid-conversation
 //   onReset()         — clears session and returns to the conversation page
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ScheduleCalendar from "../components/ScheduleCalendar.jsx";
 import TodoList from "../components/TodoList.jsx";
 import DuckPanel from "../components/DuckPanel.jsx";
 import styles from "./SchedulePage.module.css";
 
 export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
-  // tasks is a local copy so the user can toggle checkboxes without re-fetching
   const [tasks, setTasks] = useState(schedule.tasks);
+  const [hoveredLabel, setHoveredLabel] = useState(null);
+  const [lineCoords, setLineCoords] = useState(null);
+
+  // When a calendar block is hovered, measure the block and its matching task item
+  // and compute the bezier endpoints for the connecting line.
+  useEffect(() => {
+    if (!hoveredLabel) {
+      setLineCoords(null);
+      return;
+    }
+    const blockEl = document.querySelector(`[data-calendar-block="${CSS.escape(hoveredLabel)}"]`);
+    const taskEl  = document.querySelector(`[data-task-item="${CSS.escape(hoveredLabel)}"]`);
+    if (!blockEl || !taskEl) { setLineCoords(null); return; }
+
+    const br = blockEl.getBoundingClientRect();
+    const tr = taskEl.getBoundingClientRect();
+    setLineCoords({
+      x1: br.left,
+      y1: (br.top + br.bottom) / 2,
+      x2: tr.right,
+      y2: (tr.top + tr.bottom) / 2,
+    });
+  }, [hoveredLabel]);
 
   // Toggle a task's completed state when the user checks/unchecks it
   function handleToggle(id) {
@@ -33,18 +55,38 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
     onScheduleUpdated(newSchedule);
   }
 
+  const midX = lineCoords ? (lineCoords.x1 + lineCoords.x2) / 2 : 0;
+
   return (
     <div className={styles.page}>
+      {/* SVG overlay for the calendar→task connecting line */}
+      {lineCoords && (
+        <svg className={styles.svgOverlay}>
+          <path
+            d={`M ${lineCoords.x1} ${lineCoords.y1} C ${midX} ${lineCoords.y1}, ${midX} ${lineCoords.y2}, ${lineCoords.x2} ${lineCoords.y2}`}
+            stroke="var(--yellow)"
+            strokeWidth="1.5"
+            strokeDasharray="4 3"
+            strokeOpacity="0.55"
+            fill="none"
+          />
+        </svg>
+      )}
+
       {/* Left column: to-do list with checkboxes */}
       <section className={styles.column}>
         <h2 className={styles.columnTitle}>Tasks</h2>
-        <TodoList tasks={tasks} onToggle={handleToggle} />
+        <TodoList tasks={tasks} onToggle={handleToggle} hoveredLabel={hoveredLabel} />
       </section>
 
       {/* Center column: hourly day view calendar */}
       <section className={styles.column}>
         <h2 className={styles.columnTitle}>Your Day</h2>
-        <ScheduleCalendar blocks={schedule.schedule} />
+        <ScheduleCalendar
+          blocks={schedule.schedule}
+          hoveredLabel={hoveredLabel}
+          onTaskHover={setHoveredLabel}
+        />
       </section>
 
       {/* Right column: duck for follow-up edits */}

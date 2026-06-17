@@ -51,11 +51,17 @@
 .taskBlock {
   background: rgba(255, 189, 84, 0.18);
   border-left: 3px solid var(--yellow);
+  transition: background 0.15s;
+  cursor: default;
 }
 
 .breakBlock {
   background: rgba(166, 248, 255, 0.1);
   border-left: 3px solid var(--blue);
+}
+
+.taskBlock.blockHighlighted {
+  background: rgba(255, 189, 84, 0.38);
 }
 
 .blockLabel {
