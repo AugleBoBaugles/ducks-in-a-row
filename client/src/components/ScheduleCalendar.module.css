@@ -64,4 +64,25 @@
   background: rgba(255, 189, 84, 0.38);
 }
 
+/* Current time indicator */
+.nowLine {
+  position: absolute;
+  left: 48px;
+  right: 0;
+  height: 1px;
+  background: var(--blue);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.nowDot {
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
 

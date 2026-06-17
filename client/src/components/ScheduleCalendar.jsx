@@ -7,16 +7,31 @@
 //   hoveredLabel — label currently highlighted (controlled by SchedulePage)
 //   onTaskHover  — called with label on task block mouseenter, null on mouseleave
 
+import { useState, useEffect } from "react";
 import styles from "./ScheduleCalendar.module.css";
 import { timeToOffset, formatHour, computeHourRange } from "./scheduleCalendarUtils.js";
 
+function getNowOffset(startHour, endHour) {
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  if (h < startHour || h >= endHour) return null;
+  return timeToOffset(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`, startHour);
+}
+
 export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHover }) {
-  // Pixels per hour — bigger values give short blocks (10–15 min breaks) enough
-  // visible height without needing a min-height clamp that causes overlap.
   const HOUR_HEIGHT = 80;
 
-  const { startHour, hours: HOURS } = computeHourRange(blocks);
+  const { startHour, endHour, hours: HOURS } = computeHourRange(blocks);
   const totalHeight = HOURS.length * HOUR_HEIGHT;
+
+  const [nowOffset, setNowOffset] = useState(() => getNowOffset(startHour, endHour));
+
+  useEffect(() => {
+    setNowOffset(getNowOffset(startHour, endHour));
+    const id = setInterval(() => setNowOffset(getNowOffset(startHour, endHour)), 60_000);
+    return () => clearInterval(id);
+  }, [startHour, endHour]);
 
   return (
     <div className={styles.calendar}>
@@ -59,6 +74,12 @@ export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHove
             </div>
           );
         })}
+        {/* Current time indicator */}
+        {nowOffset !== null && (
+          <div className={styles.nowLine} style={{ top: nowOffset * HOUR_HEIGHT }}>
+            <div className={styles.nowDot} />
+          </div>
+        )}
       </div>
     </div>
   );
