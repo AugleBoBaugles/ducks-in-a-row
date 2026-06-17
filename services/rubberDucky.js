@@ -87,6 +87,14 @@ TONE:
 //     reply    — the duck's response text (JSON block removed)
 //     schedule — parsed schedule object if the duck emitted one, otherwise null
 // -----------------------------------------------------------------------------
+function roundTo15(timeStr) {
+  const [h, m] = timeStr.split(":").map(Number);
+  const totalMinutes = h * 60 + Math.round(m / 15) * 15;
+  const rh = Math.floor(totalMinutes / 60) % 24;
+  const rm = totalMinutes % 60;
+  return `${String(rh).padStart(2, "0")}:${String(rm).padStart(2, "0")}`;
+}
+
 export async function askRubberDucky(transcribedText, history = []) {
 
   // Inject the current time so the duck never schedules tasks in the past.
@@ -129,9 +137,18 @@ export async function askRubberDucky(transcribedText, history = []) {
   }
 
   const reply = parsed.reply?.trim() || "Your plan is ready.";
-  const schedule = parsed.tasks && parsed.schedule
-    ? { tasks: parsed.tasks, schedule: parsed.schedule }
-    : null;
+
+  let schedule = null;
+  if (parsed.tasks && parsed.schedule) {
+    schedule = {
+      tasks: parsed.tasks,
+      schedule: parsed.schedule.map((block) => ({
+        ...block,
+        startTime: roundTo15(block.startTime),
+        endTime:   roundTo15(block.endTime),
+      })),
+    };
+  }
 
   return { reply, schedule };
 }
