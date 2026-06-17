@@ -64,16 +64,4 @@
   background: rgba(255, 189, 84, 0.38);
 }
 
-.blockLabel {
-  font-size: 0.8rem;
-  color: var(--text);
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
-.blockTime {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}

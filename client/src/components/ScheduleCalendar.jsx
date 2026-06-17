@@ -55,8 +55,7 @@ export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHove
               onMouseEnter={isTask ? () => onTaskHover(block.label) : undefined}
               onMouseLeave={isTask ? () => onTaskHover(null) : undefined}
             >
-              <span className={styles.blockLabel}>{block.label}</span>
-              <span className={styles.blockTime}>{block.startTime}–{block.endTime}</span>
+
             </div>
           );
         })}
