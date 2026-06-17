@@ -10,14 +10,16 @@
 
 import { useState, useEffect } from "react";
 import styles from "./ScheduleCalendar.module.css";
-import { timeToOffset, formatHour, computeHourRange } from "./scheduleCalendarUtils.js";
+import { timeToOffset, formatHour, formatTime, computeHourRange } from "./scheduleCalendarUtils.js";
 
-function getNowOffset(startHour, endHour) {
+function getNow(startHour, endHour) {
   const now = new Date();
   const h = now.getHours();
   const m = now.getMinutes();
   if (h < startHour || h >= endHour) return null;
-  return timeToOffset(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`, startHour);
+  const timeStr = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  const label = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  return { offset: timeToOffset(timeStr, startHour), label };
 }
 
 export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHover, completedLabels = new Set() }) {
@@ -26,11 +28,11 @@ export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHove
   const { startHour, endHour, hours: HOURS } = computeHourRange(blocks);
   const totalHeight = HOURS.length * HOUR_HEIGHT;
 
-  const [nowOffset, setNowOffset] = useState(() => getNowOffset(startHour, endHour));
+  const [now, setNow] = useState(() => getNow(startHour, endHour));
 
   useEffect(() => {
-    setNowOffset(getNowOffset(startHour, endHour));
-    const id = setInterval(() => setNowOffset(getNowOffset(startHour, endHour)), 60_000);
+    setNow(getNow(startHour, endHour));
+    const id = setInterval(() => setNow(getNow(startHour, endHour)), 60_000);
     return () => clearInterval(id);
   }, [startHour, endHour]);
 
@@ -74,14 +76,15 @@ export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHove
               onMouseLeave={isTask ? () => onTaskHover(null) : undefined}
             >
               <span className={styles.blockLabel}>{block.label}</span>
-              <span className={styles.blockTime}>{block.startTime}–{block.endTime}</span>
+              <span className={styles.blockTime}>{formatTime(block.startTime)}–{formatTime(block.endTime)}</span>
             </div>
           );
         })}
         {/* Current time indicator */}
-        {nowOffset !== null && (
-          <div className={styles.nowLine} style={{ top: nowOffset * HOUR_HEIGHT }}>
+        {now !== null && (
+          <div className={styles.nowLine} style={{ top: now.offset * HOUR_HEIGHT }}>
             <div className={styles.nowDot} />
+            <span className={styles.nowLabel}>{now.label}</span>
           </div>
         )}
       </div>

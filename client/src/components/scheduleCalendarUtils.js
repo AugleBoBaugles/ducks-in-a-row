@@ -15,6 +15,14 @@ export function formatHour(h) {
   return h < 12 ? `${h} AM` : `${h - 12} PM`;
 }
 
+// Convert "HH:MM" to a 12-hour display string — e.g. "14:30" → "2:30 PM"
+export function formatTime(timeStr) {
+  const [h, m] = timeStr.split(":").map(Number);
+  const period = h < 12 ? "AM" : "PM";
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, "0")} ${period}`;
+}
+
 // Derive the visible hour range from a set of blocks with a ±1 hour buffer.
 // Falls back to 6–22 when blocks is empty.
 // Returns { startHour, endHour, hours } where hours is the array of integers.

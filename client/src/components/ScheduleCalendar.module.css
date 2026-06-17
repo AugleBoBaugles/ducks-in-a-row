@@ -15,7 +15,6 @@
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding-top: 4px;
 }
 
 .hourLabel {
@@ -31,7 +30,6 @@
 .hourLine {
   flex: 1;
   border-top: 1px solid var(--border);
-  margin-top: 10px;
 }
 
 /* Schedule blocks are absolutely positioned over the grid */
@@ -101,6 +99,17 @@
   height: 7px;
   border-radius: 50%;
   background: var(--blue);
+}
+
+.nowLabel {
+  position: absolute;
+  right: 6px;
+  top: 0;
+  transform: translateY(-100%);
+  font-size: 0.65rem;
+  color: var(--blue);
+  white-space: nowrap;
+  opacity: 0.9;
 }
 
 
