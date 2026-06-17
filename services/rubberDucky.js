@@ -59,7 +59,7 @@ When you are ready to produce the schedule, populate tasks and schedule:
 }
 
 SCHEDULE RULES:
-- Times in 24-hour HH:MM format
+- Times in 24-hour HH:MM format, rounded to the nearest 15 minutes (e.g. 09:00, 09:15, 09:30, 09:45)
 - Blocks must never overlap — each block's startTime must equal the previous block's endTime
 - Include a 10–15 minute break after every 60–90 minutes of work
 - Priority: "high", "medium", or "low"
