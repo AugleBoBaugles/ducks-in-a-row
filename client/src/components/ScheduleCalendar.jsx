@@ -1,5 +1,5 @@
 // ScheduleCalendar.jsx
-// Renders a day-view timeline — one row per hour from 6am to 10pm.
+// Renders a day-view timeline scoped to the scheduled blocks (± 1 hour buffer).
 // Task and break blocks are overlaid on the relevant hour rows.
 //
 // Props:
@@ -7,28 +7,14 @@
 //     [{ startTime: "09:00", endTime: "10:30", label: "Study", type: "task"|"break" }]
 
 import styles from "./ScheduleCalendar.module.css";
-
-// Hours to display on the timeline (24-hour integers)
-const HOURS = Array.from({ length: 17 }, (_, i) => i + 6); // 6 through 22
-
-// Convert "HH:MM" to fractional hours from 6am (the timeline start)
-// e.g. "09:30" → 3.5  (3.5 hours after 6am)
-function timeToOffset(timeStr) {
-  const [h, m] = timeStr.split(":").map(Number);
-  return (h - 6) + m / 60;
-}
-
-// Format 24h hour integer to display label ("9 AM", "2 PM", etc.)
-function formatHour(h) {
-  if (h === 12) return "12 PM";
-  if (h === 0)  return "12 AM";
-  return h < 12 ? `${h} AM` : `${h - 12} PM`;
-}
+import { timeToOffset, formatHour, computeHourRange } from "./scheduleCalendarUtils.js";
 
 export default function ScheduleCalendar({ blocks = [] }) {
   // Pixels per hour — bigger values give short blocks (10–15 min breaks) enough
   // visible height without needing a min-height clamp that causes overlap.
   const HOUR_HEIGHT = 80;
+
+  const { startHour, hours: HOURS } = computeHourRange(blocks);
   const totalHeight = HOURS.length * HOUR_HEIGHT;
 
   return (
@@ -48,8 +34,8 @@ export default function ScheduleCalendar({ blocks = [] }) {
 
         {/* Overlay the schedule blocks on the grid */}
         {blocks.map((block, i) => {
-          const topOffset  = timeToOffset(block.startTime) * HOUR_HEIGHT;
-          const endOffset  = timeToOffset(block.endTime)   * HOUR_HEIGHT;
+          const topOffset  = timeToOffset(block.startTime, startHour) * HOUR_HEIGHT;
+          const endOffset  = timeToOffset(block.endTime,   startHour) * HOUR_HEIGHT;
           const blockHeight = endOffset - topOffset;
 
           return (
