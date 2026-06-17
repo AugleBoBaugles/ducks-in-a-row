@@ -76,6 +76,29 @@
   color: var(--text-muted);
 }
 
+.tooltip {
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--yellow);
+  border-radius: 6px;
+  padding: 8px 12px;
+  pointer-events: none;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.tooltipLabel {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+.tooltipTime {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
 .taskBlock.blockHighlighted {
   background: rgba(255, 189, 84, 0.38);
 }
