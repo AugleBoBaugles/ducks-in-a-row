@@ -55,6 +55,7 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
     onScheduleUpdated(newSchedule);
   }
 
+  const completedLabels = new Set(tasks.filter((t) => t.completed).map((t) => t.name));
   const midX = lineCoords ? (lineCoords.x1 + lineCoords.x2) / 2 : 0;
 
   return (
@@ -86,6 +87,7 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
           blocks={schedule.schedule}
           hoveredLabel={hoveredLabel}
           onTaskHover={setHoveredLabel}
+          completedLabels={completedLabels}
         />
       </section>
 

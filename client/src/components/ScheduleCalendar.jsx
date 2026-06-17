@@ -5,7 +5,8 @@
 // Props:
 //   blocks       — [{ startTime, endTime, label, type: "task"|"break" }]
 //   hoveredLabel — label currently highlighted (controlled by SchedulePage)
-//   onTaskHover  — called with label on task block mouseenter, null on mouseleave
+//   onTaskHover     — called with label on task block mouseenter, null on mouseleave
+//   completedLabels — Set of task names that have been checked off
 
 import { useState, useEffect } from "react";
 import styles from "./ScheduleCalendar.module.css";
@@ -19,7 +20,7 @@ function getNowOffset(startHour, endHour) {
   return timeToOffset(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`, startHour);
 }
 
-export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHover }) {
+export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHover, completedLabels = new Set() }) {
   const HOUR_HEIGHT = 80;
 
   const { startHour, endHour, hours: HOURS } = computeHourRange(blocks);
@@ -56,6 +57,7 @@ export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHove
 
           const isTask = block.type === "task";
           const isHighlighted = hoveredLabel === block.label;
+          const isDone = isTask && completedLabels.has(block.label);
 
           return (
             <div
@@ -65,6 +67,7 @@ export default function ScheduleCalendar({ blocks = [], hoveredLabel, onTaskHove
                 styles.block,
                 isTask ? styles.taskBlock : styles.breakBlock,
                 isHighlighted ? styles.blockHighlighted : "",
+                isDone ? styles.blockDone : "",
               ].join(" ")}
               style={{ top: topOffset, height: blockHeight }}
               onMouseEnter={isTask ? () => onTaskHover(block.label) : undefined}

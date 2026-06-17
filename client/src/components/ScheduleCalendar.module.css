@@ -51,8 +51,12 @@
 .taskBlock {
   background: rgba(255, 189, 84, 0.18);
   border-left: 3px solid var(--yellow);
-  transition: background 0.15s;
+  transition: background 0.3s, opacity 0.3s;
   cursor: default;
+}
+
+.blockDone {
+  opacity: 0.3;
 }
 
 .breakBlock {
