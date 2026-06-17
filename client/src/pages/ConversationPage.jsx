@@ -28,7 +28,8 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
   const [phase, setPhase] = useState("idle");
   const [statusText, setStatusText] = useState("");
   const [duckyReply, setDuckyReply] = useState("");
-  const [hasStarted, setHasStarted] = useState(false); // hide intro text after first click
+  const [hasStarted, setHasStarted] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
 
   const MOCK_SCHEDULE = {
     tasks: [
@@ -52,6 +53,7 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
   async function handleHelp() {
     if (phase === "processing" || phase === "speaking") return;
     setHasStarted(true);
+    setChatHistory((h) => [...h, { role: "duck", text: MORTIMER_INTRO }]);
     setDuckyReply(MORTIMER_INTRO);
     await playReply(MORTIMER_INTRO);
     setPhase("idle");
@@ -65,6 +67,9 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
     if (!isRecording) {
       // ---- START RECORDING ----
       setHasStarted(true);
+      if (duckyReply) {
+        setChatHistory((h) => [...h, { role: "duck", text: duckyReply }]);
+      }
       setDuckyReply("");
 
       try {
@@ -105,6 +110,7 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
       if (!res.ok) throw new Error(`Server error ${res.status}`);
       const data = await res.json();
 
+      if (data.text) setChatHistory((h) => [...h, { role: "user", text: data.text }]);
       setDuckyReply(data.ducky);
 
       // If the duck decided it has enough info, hand off the schedule and leave
@@ -149,50 +155,61 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
 
   return (
     <div className={styles.page}>
-      {/* Intro prompt — fades out after first interaction */}
-      {!hasStarted && (
-        <p className={styles.intro}>click to speak — click again to stop</p>
-      )}
+      {/* Fixed top section — duck, status, current reply */}
+      <div className={styles.main}>
+        {!hasStarted && (
+          <p className={styles.intro}>click to speak — click again to stop</p>
+        )}
 
-      {/* The duck — click to start/stop recording */}
-      <button
-        className={`${styles.duck} ${duckClass}`}
-        onClick={handleDuckClick}
-        aria-label={isRecording ? "Stop recording" : "Start speaking"}
-        disabled={phase === "processing"}
-      >
-        <img src="/duck.png" alt="rubber duck" />
-      </button>
-
-      {!hasStarted && (
-        <div className={styles.introActions}>
-          <button className={styles.helpBtn} onClick={handleHelp}>
-            who are you?
-          </button>
-          <button className={styles.skipBtn} onClick={() => onScheduleReady(MOCK_SCHEDULE)}>
-            skip to schedule →
-          </button>
-        </div>
-      )}
-
-      {/* Status line shown during processing / speaking / errors */}
-      {statusText && (
-        <p className={`${styles.status} ${phase === "error" ? styles.statusError : ""}`}>
-          {statusText}
-        </p>
-      )}
-
-      {/* The duck's last reply — styled as a wise quote */}
-      {duckyReply && (
-        <blockquote className={styles.reply}>
-          {duckyReply}
-        </blockquote>
-      )}
-
-      {hasStarted && (
-        <button className={styles.resetBtn} onClick={onReset}>
-          start over
+        <button
+          className={`${styles.duck} ${duckClass}`}
+          onClick={handleDuckClick}
+          aria-label={isRecording ? "Stop recording" : "Start speaking"}
+          disabled={phase === "processing"}
+        >
+          <img src="/duck.png" alt="rubber duck" />
         </button>
+
+        {!hasStarted && (
+          <div className={styles.introActions}>
+            <button className={styles.helpBtn} onClick={handleHelp}>
+              who are you?
+            </button>
+            <button className={styles.skipBtn} onClick={() => onScheduleReady(MOCK_SCHEDULE)}>
+              skip to schedule →
+            </button>
+          </div>
+        )}
+
+        {statusText && (
+          <p className={`${styles.status} ${phase === "error" ? styles.statusError : ""}`}>
+            {statusText}
+          </p>
+        )}
+
+        {duckyReply && (
+          <blockquote className={styles.reply}>
+            {duckyReply}
+          </blockquote>
+        )}
+
+        {hasStarted && (
+          <button className={styles.resetBtn} onClick={onReset}>
+            start over
+          </button>
+        )}
+      </div>
+
+      {/* Scrollable history — grows downward without moving the duck */}
+      {chatHistory.length > 0 && (
+        <div className={styles.history}>
+          {chatHistory.slice().reverse().map((entry, i) => (
+            <div key={i} className={entry.role === "user" ? styles.historyUser : styles.historyDuck}>
+              <span className={styles.historyRole}>{entry.role === "user" ? "You" : "Mortimer"}</span>
+              <span className={styles.historyText}>{entry.text}</span>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
