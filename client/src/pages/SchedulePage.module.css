@@ -5,7 +5,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr 0.55fr;
   height: 100vh;
-  background: var(--bg);
+  background: linear-gradient(to right, #171414, #0a0808);
   overflow: hidden;
 }
 
