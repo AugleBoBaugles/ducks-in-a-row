@@ -3,7 +3,7 @@
 /* Three equal columns side by side filling the full viewport */
 .page {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 0.55fr;
   height: 100vh;
   background: var(--bg);
   overflow: hidden;

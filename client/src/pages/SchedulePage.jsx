@@ -35,16 +35,16 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
 
   return (
     <div className={styles.page}>
-      {/* Left column: hourly day view calendar */}
-      <section className={styles.column}>
-        <h2 className={styles.columnTitle}>Your Day</h2>
-        <ScheduleCalendar blocks={schedule.schedule} />
-      </section>
-
-      {/* Center column: to-do list with checkboxes */}
+      {/* Left column: to-do list with checkboxes */}
       <section className={styles.column}>
         <h2 className={styles.columnTitle}>Tasks</h2>
         <TodoList tasks={tasks} onToggle={handleToggle} />
+      </section>
+
+      {/* Center column: hourly day view calendar */}
+      <section className={styles.column}>
+        <h2 className={styles.columnTitle}>Your Day</h2>
+        <ScheduleCalendar blocks={schedule.schedule} />
       </section>
 
       {/* Right column: duck for follow-up edits */}
