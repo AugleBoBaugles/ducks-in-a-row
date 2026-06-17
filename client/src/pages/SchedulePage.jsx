@@ -77,7 +77,7 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
       {/* Left column: to-do list with checkboxes */}
       <section className={styles.column}>
         <h2 className={styles.columnTitle}>Tasks</h2>
-        <TodoList tasks={tasks} onToggle={handleToggle} hoveredLabel={hoveredLabel} />
+        <TodoList tasks={tasks} onToggle={handleToggle} hoveredLabel={hoveredLabel} onTaskHover={setHoveredLabel} />
       </section>
 
       {/* Center column: hourly day view calendar */}

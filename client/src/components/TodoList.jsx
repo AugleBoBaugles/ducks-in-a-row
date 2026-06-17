@@ -6,6 +6,7 @@
 //   tasks        — [{ id, name, priority, completed }]
 //   onToggle     — called with task id when checkbox is clicked
 //   hoveredLabel — task name currently highlighted (from SchedulePage hover interaction)
+//   onTaskHover  — called with task name on mouseenter, null on mouseleave
 
 import styles from "./TodoList.module.css";
 
@@ -16,7 +17,7 @@ const PRIORITY_COLORS = {
   low:    "var(--text-muted)",
 };
 
-export default function TodoList({ tasks = [], onToggle, hoveredLabel }) {
+export default function TodoList({ tasks = [], onToggle, hoveredLabel, onTaskHover }) {
   if (tasks.length === 0) {
     return <p className={styles.empty}>No tasks yet.</p>;
   }
@@ -28,6 +29,8 @@ export default function TodoList({ tasks = [], onToggle, hoveredLabel }) {
             key={task.id}
             data-task-item={task.name}
             className={`${styles.item} ${hoveredLabel === task.name ? styles.itemHighlighted : ""}`}
+            onMouseEnter={() => onTaskHover?.(task.name)}
+            onMouseLeave={() => onTaskHover?.(null)}
           >
           <label className={styles.label}>
             <input
