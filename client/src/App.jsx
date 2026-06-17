@@ -10,10 +10,12 @@
 import { useState } from "react";
 import ConversationPage from "./pages/ConversationPage.jsx";
 import SchedulePage from "./pages/SchedulePage.jsx";
+import styles from "./App.module.css";
 
 export default function App() {
   const [page, setPage] = useState("conversation");
   const [schedule, setSchedule] = useState(null);
+  const [resetKey, setResetKey] = useState(0);
 
   function onScheduleReady(newSchedule) {
     setSchedule(newSchedule);
@@ -30,12 +32,16 @@ export default function App() {
     sessionStorage.removeItem("ducks-session-id");
     setSchedule(null);
     setPage("conversation");
+    setResetKey((k) => k + 1);
   }
 
   return (
-    <>
+    <div className={styles.app}>
+      <header className={styles.header}>
+        <span className={styles.title}>Ducks in a Row</span>
+      </header>
       {page === "conversation" && (
-        <ConversationPage onScheduleReady={onScheduleReady} onReset={handleReset} />
+        <ConversationPage key={resetKey} onScheduleReady={onScheduleReady} onReset={handleReset} />
       )}
       {page === "schedule" && (
         <SchedulePage
@@ -44,6 +50,6 @@ export default function App() {
           onReset={handleReset}
         />
       )}
-    </>
+    </div>
   );
 }
