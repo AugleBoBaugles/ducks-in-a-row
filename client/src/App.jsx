@@ -10,12 +10,14 @@
 import { useState } from "react";
 import ConversationPage from "./pages/ConversationPage.jsx";
 import SchedulePage from "./pages/SchedulePage.jsx";
+import HelpModal from "./components/HelpModal.jsx";
 import styles from "./App.module.css";
 
 export default function App() {
   const [page, setPage] = useState("conversation");
   const [schedule, setSchedule] = useState(null);
   const [resetKey, setResetKey] = useState(0);
+  const [showHelp, setShowHelp] = useState(false);
 
   function onScheduleReady(newSchedule) {
     setSchedule(newSchedule);
@@ -37,8 +39,10 @@ export default function App() {
 
   return (
     <div className={styles.app}>
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       <header className={styles.header}>
         <span className={styles.title}>Ducks in a Row</span>
+        <button className={styles.helpBtn} onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
       {page === "conversation" && (
         <ConversationPage key={resetKey} onScheduleReady={onScheduleReady} onReset={handleReset} />

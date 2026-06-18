@@ -11,6 +11,7 @@
   height: 48px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 1.5rem;
   background: var(--yellow);
 }
@@ -21,4 +22,26 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #1a1818;
+}
+
+.helpBtn {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: 1.5px solid #1a1818;
+  background: none;
+  color: #1a1818;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.helpBtn:hover {
+  opacity: 1;
 }
