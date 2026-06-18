@@ -19,6 +19,23 @@ import { useAudioPlayback } from "../hooks/useAudioPlayback.js";
 import DuckButton from "../components/DuckButton.jsx";
 import styles from "./ConversationPage.module.css";
 
+const MOCK_SCHEDULE = {
+  tasks: [
+    { id: 1, name: "Deep work block",     duration: 90, priority: "high",   completed: false },
+    { id: 2, name: "Answer emails",        duration: 30, priority: "medium", completed: false },
+    { id: 3, name: "Review pull requests", duration: 45, priority: "high",   completed: false },
+    { id: 4, name: "Plan tomorrow",        duration: 20, priority: "low",    completed: false },
+  ],
+  schedule: [
+    { startTime: "09:00", endTime: "10:30", label: "Deep work block",     type: "task"  },
+    { startTime: "10:30", endTime: "10:45", label: "Break",               type: "break" },
+    { startTime: "10:45", endTime: "11:15", label: "Answer emails",       type: "task"  },
+    { startTime: "11:15", endTime: "12:00", label: "Review pull requests",type: "task"  },
+    { startTime: "12:00", endTime: "13:00", label: "Lunch",               type: "break" },
+    { startTime: "13:00", endTime: "13:20", label: "Plan tomorrow",       type: "task"  },
+  ],
+};
+
 export default function ConversationPage({ onScheduleReady, onReset }) {
   const sessionId = useSession();
   const { isRecording, start, stop } = useRecorder({ maxSeconds: 60 });
@@ -31,23 +48,6 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
   const [duckyReply, setDuckyReply] = useState("");
   const [hasStarted, setHasStarted] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
-
-  const MOCK_SCHEDULE = {
-    tasks: [
-      { id: 1, name: "Deep work block",     duration: 90, priority: "high",   completed: false },
-      { id: 2, name: "Answer emails",        duration: 30, priority: "medium", completed: false },
-      { id: 3, name: "Review pull requests", duration: 45, priority: "high",   completed: false },
-      { id: 4, name: "Plan tomorrow",        duration: 20, priority: "low",    completed: false },
-    ],
-    schedule: [
-      { startTime: "09:00", endTime: "10:30", label: "Deep work block",     type: "task"  },
-      { startTime: "10:30", endTime: "10:45", label: "Break",               type: "break" },
-      { startTime: "10:45", endTime: "11:15", label: "Answer emails",       type: "task"  },
-      { startTime: "11:15", endTime: "12:00", label: "Review pull requests",type: "task"  },
-      { startTime: "12:00", endTime: "13:00", label: "Lunch",               type: "break" },
-      { startTime: "13:00", endTime: "13:20", label: "Plan tomorrow",       type: "task"  },
-    ],
-  };
 
   const MORTIMER_INTRO = "My name is Mortimer. I'm here to help you plan your day — tell me what you need to get done, and we'll figure out when to do it. Click the duck when you're ready.";
 

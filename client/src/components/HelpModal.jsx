@@ -5,6 +5,7 @@
 // Props:
 //   onClose — called when the user dismisses the modal
 
+import Modal from "./Modal.jsx";
 import styles from "./HelpModal.module.css";
 
 const STEPS = [
@@ -17,23 +18,20 @@ const STEPS = [
 
 export default function HelpModal({ onClose }) {
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.close} onClick={onClose} aria-label="Close">×</button>
-        <h2 className={styles.title}>How it works</h2>
-        <ol className={styles.steps}>
-          {STEPS.map(({ n, label, text }) => (
-            <li key={n} className={styles.step}>
-              <span className={styles.num}>{n}</span>
-              <div>
-                <span className={styles.label}>{label}</span>
-                <span className={styles.text}>{text}</span>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <p className={styles.note}>Mortimer speaks — make sure your volume is on.</p>
-      </div>
-    </div>
+    <Modal onClose={onClose} zIndex={300}>
+      <h2 className={styles.title}>How it works</h2>
+      <ol className={styles.steps}>
+        {STEPS.map(({ n, label, text }) => (
+          <li key={n} className={styles.step}>
+            <span className={styles.num}>{n}</span>
+            <div>
+              <span className={styles.label}>{label}</span>
+              <span className={styles.text}>{text}</span>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p className={styles.note}>Mortimer speaks — make sure your volume is on.</p>
+    </Modal>
   );
 }

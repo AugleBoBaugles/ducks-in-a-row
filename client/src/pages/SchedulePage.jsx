@@ -10,7 +10,7 @@
 //   onScheduleUpdated — called when the duck refines the plan mid-conversation
 //   onReset()         — clears session and returns to the conversation page
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ScheduleCalendar from "../components/ScheduleCalendar.jsx";
 import TodoList from "../components/TodoList.jsx";
 import DuckPanel from "../components/DuckPanel.jsx";
@@ -29,17 +29,21 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
     setTaskNotes((prev) => ({ ...prev, [taskId]: note }));
   }
 
-  // Pre-fetch Mortimer's advice for all tasks on mount
-  useEffect(() => {
-    tasks.forEach((task) => {
+  // Fetch advice for a task the first time its modal is opened.
+  // Using useCallback so handleTaskClick has a stable reference.
+  const handleTaskClick = useCallback((task) => {
+    setSelectedTask(task);
+    setTaskAdvice((prev) => {
+      if (prev[task.id] !== undefined) return prev;
       fetch("/advice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ taskName: task.name, priority: task.priority, duration: task.duration }),
       })
-        .then((r) => r.json())
-        .then((data) => setTaskAdvice((prev) => ({ ...prev, [task.id]: data.advice || "" })))
-        .catch(() => setTaskAdvice((prev) => ({ ...prev, [task.id]: "Even I don't have wisdom for everything right now." })));
+        .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+        .then((data) => setTaskAdvice((p) => ({ ...p, [task.id]: data.advice || [] })))
+        .catch(() => setTaskAdvice((p) => ({ ...p, [task.id]: ["Even I don't have wisdom for everything right now."] })));
+      return { ...prev, [task.id]: [] }; // mark as loading (empty array → "thinking...")
     });
   }, []);
 
@@ -112,7 +116,7 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
         <TodoList
           tasks={tasks}
           onToggle={handleToggle}
-          onTaskClick={setSelectedTask}
+          onTaskClick={handleTaskClick}
           hoveredLabel={hoveredLabel}
           onTaskHover={setHoveredLabel}
         />

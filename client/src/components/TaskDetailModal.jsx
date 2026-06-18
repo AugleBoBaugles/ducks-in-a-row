@@ -10,16 +10,13 @@
 //   onNoteChange — called with (taskId, newNote) when the note is edited
 //   onClose      — called when the modal should close
 
+import Modal from "./Modal.jsx";
 import styles from "./TaskDetailModal.module.css";
 import { PRIORITY_COLORS } from "../utils/priorityColors.js";
 
 export default function TaskDetailModal({ task, advice, note, onNoteChange, onClose }) {
-
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.close} onClick={onClose} aria-label="Close">×</button>
-
+    <Modal onClose={onClose}>
         <h2 className={styles.taskName}>{task.name}</h2>
 
         <div className={styles.meta}>
@@ -51,7 +48,6 @@ export default function TaskDetailModal({ task, advice, note, onNoteChange, onCl
             rows={4}
           />
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
