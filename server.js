@@ -17,7 +17,7 @@ import { fileURLToPath } from "url";
 import "dotenv/config";
 
 import { transcribeAudio } from "./services/transcription.js";
-import { askRubberDucky }  from "./services/rubberDucky.js";
+import { askRubberDucky, getTaskAdvice } from "./services/rubberDucky.js";
 import { synthesizeSpeech } from "./services/tts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -118,6 +118,27 @@ app.post("/transcribe", upload.single("audio"), async (req, res) => {
 
   } catch (err) {
     console.error(`[${sessionId.slice(0, 8)}] Error:`, err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// -----------------------------------------------------------------------------
+// POST /advice
+// Returns Mortimer's advice on a specific task.
+//
+// Request:  JSON body { taskName, priority, duration }
+// Response: { advice: string }
+// -----------------------------------------------------------------------------
+app.post("/advice", async (req, res) => {
+  const { taskName, priority, duration } = req.body;
+  if (!taskName) return res.status(400).json({ error: "taskName is required." });
+
+  try {
+    const advice = await getTaskAdvice(taskName, priority || "medium", duration || 30);
+    res.json({ advice });
+  } catch (err) {
+    console.error("Advice error:", err.message);
     res.status(500).json({ error: err.message });
   }
 });

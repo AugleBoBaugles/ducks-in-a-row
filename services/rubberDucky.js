@@ -95,6 +95,32 @@ function roundTo15(timeStr) {
   return `${String(rh).padStart(2, "0")}:${String(rm).padStart(2, "0")}`;
 }
 
+export async function getTaskAdvice(taskName, priority, duration) {
+  const completion = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "system",
+        content: `You are Mortimer — a wise rubber duck scheduling assistant. Measured, unhurried, slightly intimidating but deeply caring. No exclamation marks. No hollow encouragement. Reply with JSON in this shape: { "advice": "your advice here" }`,
+      },
+      {
+        role: "user",
+        content: `The user has a task: "${taskName}" (${duration} minutes, ${priority} priority). Give exactly 3 ultra-short bullet points of practical advice. Each bullet must be 4–7 words. Reply with JSON: { "bullets": ["...", "...", "..."] }`,
+      },
+    ],
+    temperature: 0.7,
+    max_tokens: 200,
+    response_format: { type: "json_object" },
+  });
+
+  try {
+    const parsed = JSON.parse(completion.choices[0].message.content);
+    return parsed.bullets || [];
+  } catch {
+    return [];
+  }
+}
+
 export async function askRubberDucky(transcribedText, history = []) {
 
   // Inject the current time so the duck never schedules tasks in the past.

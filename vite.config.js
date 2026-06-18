@@ -18,6 +18,7 @@ export default defineConfig({
     proxy: {
       "/transcribe": "http://localhost:3000",
       "/tts":        "http://localhost:3000",
+      "/advice":     "http://localhost:3000",
     },
   },
   build: {

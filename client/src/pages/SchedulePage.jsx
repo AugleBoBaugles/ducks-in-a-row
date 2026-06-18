@@ -14,12 +14,34 @@ import { useState, useEffect } from "react";
 import ScheduleCalendar from "../components/ScheduleCalendar.jsx";
 import TodoList from "../components/TodoList.jsx";
 import DuckPanel from "../components/DuckPanel.jsx";
+import TaskDetailModal from "../components/TaskDetailModal.jsx";
 import styles from "./SchedulePage.module.css";
 
 export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
   const [tasks, setTasks] = useState(schedule.tasks);
   const [hoveredLabel, setHoveredLabel] = useState(null);
   const [lineCoords, setLineCoords] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [taskNotes, setTaskNotes] = useState({});
+  const [taskAdvice, setTaskAdvice] = useState({});
+
+  function handleNoteChange(taskId, note) {
+    setTaskNotes((prev) => ({ ...prev, [taskId]: note }));
+  }
+
+  // Pre-fetch Mortimer's advice for all tasks on mount
+  useEffect(() => {
+    tasks.forEach((task) => {
+      fetch("/advice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskName: task.name, priority: task.priority, duration: task.duration }),
+      })
+        .then((r) => r.json())
+        .then((data) => setTaskAdvice((prev) => ({ ...prev, [task.id]: data.advice || "" })))
+        .catch(() => setTaskAdvice((prev) => ({ ...prev, [task.id]: "Even I don't have wisdom for everything right now." })));
+    });
+  }, []);
 
   // When a calendar block is hovered, measure the block and its matching task item
   // and compute the bezier endpoints for the connecting line.
@@ -59,6 +81,16 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
   const midX = lineCoords ? (lineCoords.x1 + lineCoords.x2) / 2 : 0;
 
   return (
+    <>
+    {selectedTask && (
+      <TaskDetailModal
+        task={selectedTask}
+        advice={taskAdvice[selectedTask.id]}
+        note={taskNotes[selectedTask.id] || ""}
+        onNoteChange={handleNoteChange}
+        onClose={() => setSelectedTask(null)}
+      />
+    )}
     <div className={styles.page}>
       {/* SVG overlay for the calendar→task connecting line */}
       {lineCoords && (
@@ -77,7 +109,13 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
       {/* Left column: to-do list with checkboxes */}
       <section className={styles.column}>
         <h2 className={styles.columnTitle}>Tasks</h2>
-        <TodoList tasks={tasks} onToggle={handleToggle} hoveredLabel={hoveredLabel} onTaskHover={setHoveredLabel} />
+        <TodoList
+          tasks={tasks}
+          onToggle={handleToggle}
+          onTaskClick={setSelectedTask}
+          hoveredLabel={hoveredLabel}
+          onTaskHover={setHoveredLabel}
+        />
       </section>
 
       {/* Center column: hourly day view calendar */}
@@ -100,5 +138,6 @@ export default function SchedulePage({ schedule, onScheduleUpdated, onReset }) {
         </button>
       </section>
     </div>
+    </>
   );
 }

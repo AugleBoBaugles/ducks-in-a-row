@@ -27,8 +27,21 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  cursor: pointer;
   flex: 1;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  color: var(--yellow);
 }
 
 .checkbox {
