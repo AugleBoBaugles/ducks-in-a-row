@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useSession } from "../hooks/useSession.js";
 import { useRecorder } from "../hooks/useRecorder.js";
 import { useAudioPlayback } from "../hooks/useAudioPlayback.js";
+import DuckButton from "./DuckButton.jsx";
 import styles from "./DuckPanel.module.css";
 
 export default function DuckPanel({ onScheduleUpdate }) {
@@ -94,21 +95,16 @@ export default function DuckPanel({ onScheduleUpdate }) {
     } catch { /* TTS failure is non-fatal */ }
   }
 
-  const duckClass = isRecording ? styles.recording
-    : isPlaying         ? styles.speaking
-    : styles.idle;
-
   return (
     <div className={styles.panel}>
-      {/* Compact duck button */}
-      <button
-        className={`${styles.duck} ${duckClass}`}
+      <DuckButton
         onClick={handleDuckClick}
-        aria-label={isRecording ? "Stop recording" : "Speak to the duck"}
-        disabled={phase === "processing"}
-      >
-        <img src="/duck.png" alt="rubber duck" />
-      </button>
+        phase={phase}
+        isRecording={isRecording}
+        isPlaying={isPlaying}
+        size="small"
+        ariaLabel={isRecording ? "Stop recording" : "Speak to the duck"}
+      />
 
       <p className={`${styles.status} ${phase === "error" ? styles.error : ""}`}>
         {statusText}

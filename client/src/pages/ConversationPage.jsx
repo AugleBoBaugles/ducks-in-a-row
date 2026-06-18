@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useSession } from "../hooks/useSession.js";
 import { useRecorder } from "../hooks/useRecorder.js";
 import { useAudioPlayback } from "../hooks/useAudioPlayback.js";
+import DuckButton from "../components/DuckButton.jsx";
 import styles from "./ConversationPage.module.css";
 
 export default function ConversationPage({ onScheduleReady, onReset }) {
@@ -148,11 +149,6 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
     }
   }
 
-  // Pick the CSS class that controls which duck animation plays
-  const duckClass = isRecording ? styles.recording
-    : isPlaying         ? styles.speaking
-    : styles.idle;
-
   return (
     <div className={styles.page}>
       {/* Fixed top section — duck, status, current reply */}
@@ -161,14 +157,14 @@ export default function ConversationPage({ onScheduleReady, onReset }) {
           <p className={styles.intro}>click to speak — click again to stop</p>
         )}
 
-        <button
-          className={`${styles.duck} ${duckClass}`}
+        <DuckButton
           onClick={handleDuckClick}
-          aria-label={isRecording ? "Stop recording" : "Start speaking"}
-          disabled={phase === "processing"}
-        >
-          <img src="/duck.png" alt="rubber duck" />
-        </button>
+          phase={phase}
+          isRecording={isRecording}
+          isPlaying={isPlaying}
+          size="large"
+          ariaLabel={isRecording ? "Stop recording" : "Start speaking"}
+        />
 
         {!hasStarted && (
           <div className={styles.introActions}>

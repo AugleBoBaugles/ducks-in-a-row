@@ -69,18 +69,24 @@ ducks-in-a-row/
 │   ├── index.html
 │   ├── public/duck.png     Duck illustration
 │   └── src/
-│       ├── App.jsx                      Page router
+│       ├── App.jsx                         Page router + help modal trigger
 │       ├── pages/
-│       │   ├── ConversationPage.jsx     Opening screen
-│       │   └── SchedulePage.jsx         3-column plan view
+│       │   ├── ConversationPage.jsx        Opening screen — talk to the duck
+│       │   └── SchedulePage.jsx            3-column plan view
 │       ├── components/
-│       │   ├── ScheduleCalendar.jsx     Hourly timeline
-│       │   ├── TodoList.jsx             Interactive checklist
-│       │   └── DuckPanel.jsx            Duck on the schedule page
+│       │   ├── DuckButton.jsx              Animated duck button (large + small variants)
+│       │   ├── DuckPanel.jsx               Compact duck interaction on the schedule page
+│       │   ├── HelpModal.jsx               "How it works" overlay
+│       │   ├── ScheduleCalendar.jsx        Hourly day-view timeline
+│       │   ├── TaskDetailModal.jsx         Per-task tips + notes overlay
+│       │   └── TodoList.jsx                Interactive task checklist
+│       ├── utils/
+│       │   ├── priorityColors.js           Shared priority → color map
+│       │   └── scheduleCalendarUtils.js    Time/offset math for the calendar
 │       └── hooks/
-│           ├── useRecorder.js           MediaRecorder wrapper
-│           ├── useSession.js            Session ID persistence
-│           └── useAudioPlayback.js      Base64 MP3 playback
+│           ├── useRecorder.js              MediaRecorder wrapper
+│           ├── useSession.js               Session ID persistence
+│           └── useAudioPlayback.js         Base64 MP3 playback
 └── tests/
     ├── unit/               Vitest — services tested in isolation
     ├── integration/        Vitest + Supertest — Express routes

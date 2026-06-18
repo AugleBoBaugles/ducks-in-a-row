@@ -31,55 +31,6 @@
   font-size: 0.95rem;
 }
 
-/* The duck button — large, centered, no default button styling */
-.duck {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 1rem;
-  border-radius: 50%;
-  transition: transform 0.2s ease, filter 0.2s ease;
-  outline: none;
-}
-
-.duck img {
-  width: 180px;
-  height: 180px;
-  display: block;
-}
-
-/* Idle: subtle glow on hover */
-.duck.idle:hover {
-  transform: scale(1.05);
-  filter: drop-shadow(0 0 20px rgba(255, 189, 84, 0.4));
-}
-
-/* Recording: pulsing yellow glow */
-.duck.recording {
-  animation: pulse 1.2s ease-in-out infinite;
-}
-
-/* Speaking: gentle bob */
-.duck.speaking {
-  animation: bob 0.8s ease-in-out infinite;
-}
-
-/* Disabled state while processing */
-.duck:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@keyframes pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 189, 84, 0.5)); }
-  50%       { filter: drop-shadow(0 0 28px rgba(255, 189, 84, 0.9)); transform: scale(1.04); }
-}
-
-@keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-8px); }
-}
-
 /* Status text below the duck */
 .status {
   color: var(--text-muted);

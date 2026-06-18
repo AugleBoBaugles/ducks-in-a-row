@@ -10,13 +10,7 @@
 //   onTaskHover  — called with task name on mouseenter, null on mouseleave
 
 import styles from "./TodoList.module.css";
-
-// Priority badge colors map
-const PRIORITY_COLORS = {
-  high:   "var(--danger)",
-  medium: "var(--yellow)",
-  low:    "var(--text-muted)",
-};
+import { PRIORITY_COLORS } from "../utils/priorityColors.js";
 
 export default function TodoList({ tasks = [], onToggle, onTaskClick, hoveredLabel, onTaskHover }) {
   if (tasks.length === 0) {

@@ -7,7 +7,7 @@ import {
   computeHourRange,
   timeToOffset,
   formatHour,
-} from "../../client/src/components/scheduleCalendarUtils.js";
+} from "../../client/src/utils/scheduleCalendarUtils.js";
 
 // ---------------------------------------------------------------------------
 // computeHourRange

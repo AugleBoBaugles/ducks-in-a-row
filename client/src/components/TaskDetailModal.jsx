@@ -11,12 +11,7 @@
 //   onClose      — called when the modal should close
 
 import styles from "./TaskDetailModal.module.css";
-
-const PRIORITY_COLORS = {
-  high:   "var(--danger)",
-  medium: "var(--yellow)",
-  low:    "var(--text-muted)",
-};
+import { PRIORITY_COLORS } from "../utils/priorityColors.js";
 
 export default function TaskDetailModal({ task, advice, note, onNoteChange, onClose }) {
 

@@ -10,7 +10,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./ScheduleCalendar.module.css";
-import { timeToOffset, formatHour, formatTime, computeHourRange } from "./scheduleCalendarUtils.js";
+import { timeToOffset, formatHour, formatTime, computeHourRange } from "../utils/scheduleCalendarUtils.js";
 
 function getNow(startHour, endHour) {
   const now = new Date();
